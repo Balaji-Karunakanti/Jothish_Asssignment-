@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-type Employee = string[]; // Each employee is an array of 6 strings
+type Employee = string[];
 
 const List: React.FC = () => {
   const navigate = useNavigate();
@@ -23,7 +23,6 @@ const List: React.FC = () => {
     }
 
     const parsedData: Employee[] = JSON.parse(storedData);
-    // eslint-disable-next-line react-hooks/immutability
     simulateLoading(parsedData);
   }, [navigate]);
 
@@ -58,7 +57,6 @@ const List: React.FC = () => {
   // 🎯 Random Status Generator
   const getStatus = (): "Active" | "On Leave" | "Terminated" => {
     const statuses = ["Active", "On Leave", "Terminated"] as const;
-    // eslint-disable-next-line react-hooks/purity
     return statuses[Math.floor(Math.random() * statuses.length)];
   };
 
@@ -77,6 +75,13 @@ const List: React.FC = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  // 👉 Navigate to Details
+  const goToDetails = (employee: Employee) => {
+    navigate("/details", {
+      state: { employee },
+    });
   };
 
   return (
@@ -130,7 +135,8 @@ const List: React.FC = () => {
                 return (
                   <div
                     key={index}
-                    className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg transition"
+                    onClick={() => goToDetails(emp)}
+                    className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg transition cursor-pointer"
                   >
                     <div className="flex justify-between items-center mb-4">
                       <img
@@ -161,7 +167,14 @@ const List: React.FC = () => {
                         <p className="font-semibold">{emp[5]}</p>
                       </div>
 
-                      <button className="bg-yellow-400 hover:bg-yellow-500 px-4 py-2 rounded-lg text-sm font-medium transition">
+                      {/* Prevent button from triggering parent click */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          goToDetails(emp);
+                        }}
+                        className="bg-yellow-400 hover:bg-yellow-500 px-4 py-2 rounded-lg text-sm font-medium transition"
+                      >
                         View Details
                       </button>
                     </div>
